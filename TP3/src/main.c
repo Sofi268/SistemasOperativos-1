@@ -17,7 +17,8 @@ int main(void) {
 
     // Asignacion de varios bloques aleatorios
     for (int i = 0; i < MAX_BLOCKS; i++) {
-        sizes[i] = (rand() % MAX_SIZE) + 1;
+        // sizes[i] = (rand() % MAX_SIZE) + 1;
+        sizes[i] = (size_t)(rand() % MAX_SIZE) + 1;
         blocks[i] = malloc(sizes[i]);
         if (!blocks[i]) {
             printf("malloc fallo en bloque %d\n", i);
@@ -38,7 +39,9 @@ int main(void) {
     // Realloc de algunos bloques
     for (int i = 0; i < MAX_BLOCKS; i++) {
         if (blocks[i]) {
-            size_t new_size = sizes[i] + (rand() % 64);
+            //size_t new_size = sizes[i] + (rand() % 64);
+            size_t new_size = sizes[i] + (size_t)(rand() % 64);
+
             blocks[i] = realloc(blocks[i], new_size);
             sizes[i] = new_size;
             if (blocks[i])
