@@ -133,6 +133,27 @@ void execCommand(char* args[])
 
         echoCommand(echo_arg); // Llamar a echoCommand con todos los argumentos concatenados
     }
+    else if (strcmp(args[0], "buscarconfig") == 0) {
+        if (args[1] != NULL) {
+            buscarConfig(args[1], "paths"); 
+        } else {
+            fprintf(stderr, "Uso: buscarconfig <directorio>\n");
+        }
+    }
+    else if (strcmp(args[0], "leerconfig") == 0) {
+        if (args[1] != NULL) {
+            buscarConfig(args[1], "contenido"); 
+        } else {
+            fprintf(stderr, "Uso: leerconfig <directorio>\n");
+        }
+    }
+    else if (strcmp(args[0], "buscarformato") == 0) {
+        if (args[1] != NULL||args[2] != NULL) {
+            buscarFormato(args[1],args[2]); 
+        } else {
+            fprintf(stderr, "Uso: buscarformato <directorio raiz> <formato>\n");
+        }
+    }
     else
     {
         // Invocar programas externos
