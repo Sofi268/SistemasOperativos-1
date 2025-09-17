@@ -103,6 +103,111 @@ void echoCommand(char* arg)
     printf("%s\n", result); // Imprimir el resultado
 }
 
+void buscarConfig(char* path, char* operacion){
+    DIR* dir = opendir(path);
+    if (!dir) {
+        perror("No se puede abrir el directorio");
+        return;
+    }
+
+    struct dirent* entry;
+    char fullpath[MAX_DIR_LENGTH];
+    int found = 0; // contador de archivos encontrados
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(fullpath, MAX_DIR_LENGTH, "%s/%s", path, entry->d_name);
+
+        struct stat st;
+        if (stat(fullpath, &st) == -1)
+            continue;
+
+        if (S_ISREG(st.st_mode)) {
+            if (strstr(entry->d_name, ".config") || strstr(entry->d_name, ".json") ||
+                strstr(entry->d_name, ".conf")   || strstr(entry->d_name, ".cfg")  ||
+                strstr(entry->d_name, ".ini")    || strstr(entry->d_name, ".yaml") ||
+                strstr(entry->d_name, ".yml")    || strstr(entry->d_name, ".env")  ||
+                strstr(entry->d_name, ".toml")   || strstr(entry->d_name, ".properties")) {
+
+                char abs_path[MAX_DIR_LENGTH];
+                if (realpath(fullpath, abs_path)) { // Ruta absoluta
+                    found++;
+                    if (strcmp(operacion, "paths") == 0) {
+                        printf("%s\n", abs_path);
+                    } else if (strcmp(operacion, "contenido") == 0) {
+                        FILE* f = fopen(abs_path, "r");
+                        if (!f) {
+                            perror(abs_path);
+                            continue;
+                        }
+                        printf("=== Contenido de %s ===\n", abs_path);
+                        char buffer[1024];
+                        while (fgets(buffer, sizeof(buffer), f)) {
+                            printf("%s", buffer);
+                        }
+                        printf("\n------------------------\n\n");
+                        fclose(f);
+                    } else {
+                        printf("Operación desconocida: %s\n", operacion);
+                    }
+                } else {
+                    perror("realpath");
+                }
+            }
+        }
+    }
+
+    if (found == 0) {
+        printf("No se encontraron archivos de configuración en: %s\n", path);
+    }
+
+    closedir(dir);
+}
+
+void buscarFormato(char* path, const char* formato) {
+    if (access(path, R_OK) != 0) {
+        return; // Ignora directorios sin permisos
+    }
+    DIR* dir = opendir(path);
+    if (!dir) {
+        perror("No se puede abrir el directorio");
+        return;
+    }
+
+    struct dirent* entry;
+    char fullpath[MAX_DIR_LENGTH];
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(fullpath, MAX_DIR_LENGTH, "%s/%s", path, entry->d_name);
+
+        struct stat st;
+        if (stat(fullpath, &st) == -1)
+            continue;
+
+        if (S_ISDIR(st.st_mode)) {
+            // Recursión en subdirectorio
+            buscarFormato(fullpath, formato);
+        } else if (S_ISREG(st.st_mode)) {
+            // Verificar coincidencia con el formato
+            if (strstr(entry->d_name, formato)) {
+                char abs_path[MAX_DIR_LENGTH];
+                if (realpath(fullpath, abs_path)) {
+                    printf("%s\n", abs_path);
+                } else {
+                    perror("realpath");
+                }
+            }
+        }
+    }
+
+    closedir(dir);
+}
+
 bool isRunning = false;
 pid_t idRunning = -1;
 
