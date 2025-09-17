@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <dirent.h>
 
 /**
  * @brief Longitud máxima para nombres de directorios.
@@ -55,6 +56,32 @@ void clearScreen(void);
  * @param arg Cadena de texto a imprimir.
  */
 void echoCommand(char* arg);
+
+/**
+ * @brief Lista o muestra el contenido de archivos de configuración en un directorio.
+ *
+ * Busca en el directorio indicado archivos considerados de configuración
+ * (como .config, .json, .conf, .cfg, .ini, .yaml, .yml, .env, .toml o .properties)
+ * y realiza una acción dependiendo del parámetro 'operacion':
+ * - "paths": imprime la ruta completa de cada archivo encontrado.
+ * - "contenido": imprime el contenido de cada archivo encontrado.
+ *
+ * @param path Ruta del directorio donde buscar los archivos de configuración.
+ * @param operacion Operación a realizar: "paths" para mostrar rutas, 
+ *                  "contenido" para mostrar el contenido de los archivos.
+ */
+void buscarConfig(char* path, char* operacion);
+
+/**
+ * @brief Busca archivos con un formato específico de manera recursiva.
+ *
+ * Busca archivos en el directorio dado y todos sus subdirectorios que terminen
+ * con la extensión/patrón indicado.
+ *
+ * @param path Directorio raíz donde iniciar la búsqueda.
+ * @param formato Extensión o patrón del archivo a buscar
+ */
+void buscarFormato(char* path, const char* formato);
 
 /**
  * @brief Verifica si el monitor está en ejecución.
