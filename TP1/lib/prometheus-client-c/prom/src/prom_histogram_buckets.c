@@ -25,93 +25,79 @@
 #include "prom_assert.h"
 #include "prom_log.h"
 
-prom_histogram_buckets_t* prom_histogram_default_buckets = NULL;
+prom_histogram_buckets_t *prom_histogram_default_buckets = NULL;
 
-prom_histogram_buckets_t* prom_histogram_buckets_new(size_t count, double bucket, ...)
-{
-    prom_histogram_buckets_t* self = (prom_histogram_buckets_t*)prom_malloc(sizeof(prom_histogram_buckets_t));
-    self->count = count;
-    double* upper_bounds = (double*)prom_malloc(sizeof(double) * count);
-    upper_bounds[0] = bucket;
-    if (count == 1)
-    {
-        self->upper_bounds = upper_bounds;
-        return self;
-    }
-    va_list arg_list;
-    va_start(arg_list, bucket);
-    for (int i = 1; i < count; i++)
-    {
-        upper_bounds[i] = va_arg(arg_list, double);
-    }
-    va_end(arg_list);
+prom_histogram_buckets_t *prom_histogram_buckets_new(size_t count, double bucket, ...) {
+  prom_histogram_buckets_t *self = (prom_histogram_buckets_t *)prom_malloc(sizeof(prom_histogram_buckets_t));
+  self->count = count;
+  double *upper_bounds = (double *)prom_malloc(sizeof(double) * count);
+  upper_bounds[0] = bucket;
+  if (count == 1) {
     self->upper_bounds = upper_bounds;
     return self;
+  }
+  va_list arg_list;
+  va_start(arg_list, bucket);
+  for (int i = 1; i < count; i++) {
+    upper_bounds[i] = va_arg(arg_list, double);
+  }
+  va_end(arg_list);
+  self->upper_bounds = upper_bounds;
+  return self;
 }
 
-prom_histogram_buckets_t* prom_histogram_buckets_linear(double start, double width, size_t count)
-{
-    if (count <= 1)
-        return NULL;
+prom_histogram_buckets_t *prom_histogram_buckets_linear(double start, double width, size_t count) {
+  if (count <= 1) return NULL;
 
-    prom_histogram_buckets_t* self = (prom_histogram_buckets_t*)prom_malloc(sizeof(prom_histogram_buckets_t));
+  prom_histogram_buckets_t *self = (prom_histogram_buckets_t *)prom_malloc(sizeof(prom_histogram_buckets_t));
 
-    double* upper_bounds = (double*)prom_malloc(sizeof(double) * count);
-    upper_bounds[0] = start;
-    for (size_t i = 1; i < count; i++)
-    {
-        upper_bounds[i] = upper_bounds[i - 1] + width;
-    }
-    self->upper_bounds = upper_bounds;
-    self->count = count;
-    return self;
+  double *upper_bounds = (double *)prom_malloc(sizeof(double) * count);
+  upper_bounds[0] = start;
+  for (size_t i = 1; i < count; i++) {
+    upper_bounds[i] = upper_bounds[i - 1] + width;
+  }
+  self->upper_bounds = upper_bounds;
+  self->count = count;
+  return self;
 }
 
-prom_histogram_buckets_t* prom_histogram_buckets_exponential(double start, double factor, size_t count)
-{
-    if (count < 1)
-    {
-        PROM_LOG("count must be less than 1");
-        return NULL;
-    }
-    if (start <= 0)
-    {
-        PROM_LOG("start must be less than or equal to 0");
-        return NULL;
-    }
-    if (factor <= 1)
-    {
-        PROM_LOG("factor must be less than or equal to 1");
-        return NULL;
-    }
+prom_histogram_buckets_t *prom_histogram_buckets_exponential(double start, double factor, size_t count) {
+  if (count < 1) {
+    PROM_LOG("count must be less than 1");
+    return NULL;
+  }
+  if (start <= 0) {
+    PROM_LOG("start must be less than or equal to 0");
+    return NULL;
+  }
+  if (factor <= 1) {
+    PROM_LOG("factor must be less than or equal to 1");
+    return NULL;
+  }
 
-    prom_histogram_buckets_t* self = (prom_histogram_buckets_t*)prom_malloc(sizeof(prom_histogram_buckets_t));
+  prom_histogram_buckets_t *self = (prom_histogram_buckets_t *)prom_malloc(sizeof(prom_histogram_buckets_t));
 
-    double* upper_bounds = (double*)prom_malloc(sizeof(double) * count);
-    upper_bounds[0] = start;
-    for (size_t i = 1; i < count; i++)
-    {
-        upper_bounds[i] = upper_bounds[i - 1] * factor;
-    }
-    self->upper_bounds = upper_bounds;
-    self->count = count;
-    return self;
+  double *upper_bounds = (double *)prom_malloc(sizeof(double) * count);
+  upper_bounds[0] = start;
+  for (size_t i = 1; i < count; i++) {
+    upper_bounds[i] = upper_bounds[i - 1] * factor;
+  }
+  self->upper_bounds = upper_bounds;
+  self->count = count;
+  return self;
 }
 
-int prom_histogram_buckets_destroy(prom_histogram_buckets_t* self)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 0;
-    prom_free((double*)self->upper_bounds);
-    self->upper_bounds = NULL;
-    prom_free(self);
-    self = NULL;
-    return 0;
+int prom_histogram_buckets_destroy(prom_histogram_buckets_t *self) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 0;
+  prom_free((double *)self->upper_bounds);
+  self->upper_bounds = NULL;
+  prom_free(self);
+  self = NULL;
+  return 0;
 }
 
-size_t prom_histogram_buckets_count(prom_histogram_buckets_t* self)
-{
-    PROM_ASSERT(self != NULL);
-    return self->count;
+size_t prom_histogram_buckets_count(prom_histogram_buckets_t *self) {
+  PROM_ASSERT(self != NULL);
+  return self->count;
 }

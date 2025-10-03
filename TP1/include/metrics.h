@@ -3,13 +3,7 @@
  * @brief Funciones para obtener el uso de CPU y memoria desde el sistema de archivos /proc.
  */
 
-#include <ctype.h>
-#include <dirent.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <memory.h>
 
 /**
  * @brief Tamaño del buffer utilizado para almacenar datos.
@@ -35,6 +29,15 @@
  */
 #define MULTI_BUFFER_SIZE (4 * BUFFER_SIZE)
 
+static unsigned long long total_malloc_time = 0;
+static unsigned long long total_free_time = 0;
+static unsigned long long total_realloc_time = 0;
+static unsigned long long total_calloc_time = 0;
+
+static size_t malloc_calls = 0;
+static size_t free_calls = 0;
+static size_t realloc_calls = 0;
+static size_t calloc_calls = 0;
 /**
  * @brief Obtiene el porcentaje de uso de memoria desde /proc/meminfo.
  *
@@ -225,3 +228,57 @@ double get_inactive_time();
  * @return Devuelve el total de tiempo de espera por operaciones de I/O.
  */
 double get_IO_wait();
+
+/**
+ * @brief Obtiene la memoria RAM residente (RSS).
+ *
+ * @return Cantidad de memoria residente en KB utilizada por el proceso.
+ */
+double get_resident_memory();
+
+/**
+ * @brief Obtiene la memoria virtual utilizada por el proceso.
+ *
+ * @return Cantidad de memoria virtual en KB.
+ */
+double get_virtual_memory();
+
+/**
+ * @brief Obtiene el tamaño actual del heap.
+ *
+ * @return Tamaño del heap en bytes.
+ */
+double get_heap_size();
+
+/**
+ * @brief Obtiene el tiempo promedio de ejecución de malloc.
+ *
+ * @return Tiempo promedio en nanosegundos de malloc/new_malloc.
+ */
+double get_avg_malloc_time();
+
+/**
+ * @brief Obtiene el tiempo promedio de ejecución de free.
+ *
+ * @return Tiempo promedio en nanosegundos de free/new_free.
+ */
+double get_avg_free_time();
+
+/**
+ * @brief Obtiene el tiempo promedio de ejecución de realloc.
+ *
+ * @return Tiempo promedio en nanosegundos de realloc/new_realloc.
+ */
+double get_avg_realloc_time();
+
+/**
+ * @brief Obtiene el tiempo promedio de ejecución de calloc.
+ *
+ * @return Tiempo promedio en nanosegundos de calloc/new_calloc.
+ */
+double get_avg_calloc_time();
+
+void add_malloc_time(unsigned long long ns);
+void add_free_time(unsigned long long ns);
+void add_realloc_time(unsigned long long ns);
+void add_calloc_time(unsigned long long ns);

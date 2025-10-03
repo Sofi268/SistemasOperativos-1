@@ -19,43 +19,36 @@
 
 #include "prom_linked_list.h"
 
-typedef enum
-{
-    PROM_LESS = -1,
-    PROM_EQUAL = 0,
-    PROM_GREATER = 1
-} prom_linked_list_compare_t;
+typedef enum { PROM_LESS = -1, PROM_EQUAL = 0, PROM_GREATER = 1 } prom_linked_list_compare_t;
 
 /**
  * @brief API PRIVATE Frees an item in a prom_linked_list_node
  */
-typedef void (*prom_linked_list_free_item_fn)(void*);
+typedef void (*prom_linked_list_free_item_fn)(void *);
 
 /**
  * @brief API PRIVATE Compares two items within a prom_linked_list
  */
-typedef prom_linked_list_compare_t (*prom_linked_list_compare_item_fn)(void* item_a, void* item_b);
+typedef prom_linked_list_compare_t (*prom_linked_list_compare_item_fn)(void *item_a, void *item_b);
 
 /**
  * @brief API PRIVATE A struct containing a generic item, represented as a void pointer, and next, a pointer to the
  * next prom_linked_list_node*
  */
-typedef struct prom_linked_list_node
-{
-    struct prom_linked_list_node* next;
-    void* item;
+typedef struct prom_linked_list_node {
+  struct prom_linked_list_node *next;
+  void *item;
 } prom_linked_list_node_t;
 
 /**
  * @brief API PRIVATE A linked list comprised of prom_linked_list_node* instances
  */
-struct prom_linked_list
-{
-    prom_linked_list_node_t* head;
-    prom_linked_list_node_t* tail;
-    size_t size;
-    prom_linked_list_free_item_fn free_fn;
-    prom_linked_list_compare_item_fn compare_fn;
+struct prom_linked_list {
+  prom_linked_list_node_t *head;
+  prom_linked_list_node_t *tail;
+  size_t size;
+  prom_linked_list_free_item_fn free_fn;
+  prom_linked_list_compare_item_fn compare_fn;
 };
 
-#endif // PROM_LIST_T_H
+#endif  // PROM_LIST_T_H

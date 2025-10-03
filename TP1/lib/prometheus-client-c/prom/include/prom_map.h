@@ -23,4 +23,4 @@ typedef struct prom_map prom_map_t;
 struct prom_map_node;
 typedef struct prom_map_node prom_map_node_t;
 
-#endif // PROM_MAP_H
+#endif  // PROM_MAP_H

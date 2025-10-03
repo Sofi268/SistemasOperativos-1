@@ -23,6 +23,6 @@
 #define PROM_ASSERT(i) assert(i);
 #else
 #define PROM_ASSERT(i)
-#endif // PROM_TEST
+#endif  // PROM_TEST
 
-#endif // PROM_ASSERT_H
+#endif  // PROM_ASSERT_H

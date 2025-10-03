@@ -34,7 +34,7 @@ typedef struct prom_collector_registry prom_collector_registry_t;
  * @brief Initialize the default registry by calling prom_collector_registry_init within your program. You MUST NOT
  * modify this value.
  */
-extern prom_collector_registry_t* PROM_COLLECTOR_REGISTRY_DEFAULT;
+extern prom_collector_registry_t *PROM_COLLECTOR_REGISTRY_DEFAULT;
 
 /**
  * @brief Initializes the default collector registry and enables metric collection on the executing process
@@ -47,21 +47,21 @@ int prom_collector_registry_default_init(void);
  * @param name The name of the collector registry. It MUST NOT be default.
  * @return The constructed prom_collector_registry_t*
  */
-prom_collector_registry_t* prom_collector_registry_new(const char* name);
+prom_collector_registry_t *prom_collector_registry_new(const char *name);
 
 /**
  * @brief Destroy a collector registry. You MUST set self to NULL after destruction.
  * @param self The target prom_collector_registry_t*
  * @return A non-zero integer value upon failure
  */
-int prom_collector_registry_destroy(prom_collector_registry_t* self);
+int prom_collector_registry_destroy(prom_collector_registry_t *self);
 
 /**
  * @brief Enable process metrics on the given collector registry
  * @param self The target prom_collector_registry_t*
  * @return A non-zero integer value upon failure
  */
-int prom_collector_registry_enable_process_metrics(prom_collector_registry_t* self);
+int prom_collector_registry_enable_process_metrics(prom_collector_registry_t *self);
 
 /**
  * @brief Registers a metric with the default collector on PROM_DEFAULT_COLLECTOR_REGISTRY
@@ -74,7 +74,7 @@ int prom_collector_registry_enable_process_metrics(prom_collector_registry_t* se
  * @param metric The metric to register on PROM_DEFAULT_COLLECTOR_REGISTRY*
  * @return The registered prom_metric_t*
  */
-prom_metric_t* prom_collector_registry_must_register_metric(prom_metric_t* metric);
+prom_metric_t *prom_collector_registry_must_register_metric(prom_metric_t *metric);
 
 /**
  * @brief Registers a metric with the default collector on PROM_DEFAULT_COLLECTOR_REGISTRY. Returns an non-zero integer
@@ -85,7 +85,7 @@ prom_metric_t* prom_collector_registry_must_register_metric(prom_metric_t* metri
  * @param metric The metric to register on PROM_DEFAULT_COLLECTOR_REGISTRY*
  * @return A non-zero integer value upon failure
  */
-int prom_collector_registry_register_metric(prom_metric_t* metric);
+int prom_collector_registry_register_metric(prom_metric_t *metric);
 
 /**
  * @brief Register a collector with the given registry. Returns a non-zero integer value on failure.
@@ -93,7 +93,7 @@ int prom_collector_registry_register_metric(prom_metric_t* metric);
  * @param collector The prom_collector_t* to register onto the prom_collector_registry_t* as self
  * @return A non-zero integer value upon failure
  */
-int prom_collector_registry_register_collector(prom_collector_registry_t* self, prom_collector_t* collector);
+int prom_collector_registry_register_collector(prom_collector_registry_t *self, prom_collector_t *collector);
 
 /**
  * @brief Returns a string in the default metric exposition format. The string MUST be freed to avoid unnecessary heap
@@ -104,7 +104,7 @@ int prom_collector_registry_register_collector(prom_collector_registry_t* self, 
  * @param self The target prom_collector_registry_t*
  * @return The string int he default metric exposition format.
  */
-const char* prom_collector_registry_bridge(prom_collector_registry_t* self);
+const char *prom_collector_registry_bridge(prom_collector_registry_t *self);
 
 /**
  *@brief Validates that the given metric name complies with the specification:
@@ -117,6 +117,6 @@ const char* prom_collector_registry_bridge(prom_collector_registry_t* self);
  * @param metric_name The metric name to validate
  * @return A non-zero integer value upon failure
  */
-int prom_collector_registry_validate_metric_name(prom_collector_registry_t* self, const char* metric_name);
+int prom_collector_registry_validate_metric_name(prom_collector_registry_t *self, const char *metric_name);
 
-#endif // PROM_H
+#endif  // PROM_H

@@ -40,14 +40,14 @@ typedef struct prom_collector prom_collector_t;
  * @param self The target prom_collector_t*
  * @return The prom_map_t* containing the collected metrics
  */
-typedef prom_map_t* prom_collect_fn(prom_collector_t* self);
+typedef prom_map_t *prom_collect_fn(prom_collector_t *self);
 
 /**
  * @brief Create a collector
  * @param name The name of the collector. The name MUST NOT be default or process.
  * @return The constructed prom_collector_t*
  */
-prom_collector_t* prom_collector_new(const char* name);
+prom_collector_t *prom_collector_new(const char *name);
 
 /**
  *@brief Construct a prom_collector_t* which includes the default process metrics
@@ -57,27 +57,27 @@ prom_collector_t* prom_collector_new(const char* name);
  *                  by the host environment. Otherwise, pass a string to said path.
  * @return The constructed prom_collector_t*
  */
-prom_collector_t* prom_collector_process_new(const char* limits_path, const char* stat_path);
+prom_collector_t *prom_collector_process_new(const char *limits_path, const char *stat_path);
 
 /**
  * @brief Destroy a collector. You MUST set self to NULL after destruction.
  * @param self The target prom_collector_t*
  * @return A non-zero integer value upon failure.
  */
-int prom_collector_destroy(prom_collector_t* self);
+int prom_collector_destroy(prom_collector_t *self);
 
 /**
  * @brief Frees a collector passed as a void pointer. You MUST set self to NULL after destruction.
  * @param gen The target prom_collector_t* represented as a void*
  */
-void prom_collector_free_generic(void* gen);
+void prom_collector_free_generic(void *gen);
 
 /**
  * @brief Destroys a collector passed as a void pointer. You MUST set self to NULL after destruction.
  * @param gen The target prom_collector_t* represented as a void*
  * @return A non-zero integer value upon failure.
  */
-int prom_collector_destroy_generic(void* gen);
+int prom_collector_destroy_generic(void *gen);
 
 /**
  * @brief Add a metric to a collector
@@ -85,7 +85,7 @@ int prom_collector_destroy_generic(void* gen);
  * @param metric the prom_metric_t* to add to the prom_collector_t* passed as self.
  * @return A non-zero integer value upon failure.
  */
-int prom_collector_add_metric(prom_collector_t* self, prom_metric_t* metric);
+int prom_collector_add_metric(prom_collector_t *self, prom_metric_t *metric);
 
 /**
  * @brief The collect function is responsible for doing any work involving a set of metrics and then returning them
@@ -95,6 +95,6 @@ int prom_collector_add_metric(prom_collector_t* self, prom_metric_t* metric);
  *           returning the collected metrics for exposition.
  * @return A non-zero integer value upon failure.
  */
-int prom_collector_set_collect_fn(prom_collector_t* self, prom_collect_fn* fn);
+int prom_collector_set_collect_fn(prom_collector_t *self, prom_collect_fn *fn);
 
-#endif // PROM_COLLECTOR_H
+#endif  // PROM_COLLECTOR_H

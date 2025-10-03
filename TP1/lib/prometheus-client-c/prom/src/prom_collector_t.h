@@ -21,14 +21,13 @@
 #include "prom_map_t.h"
 #include "prom_string_builder_t.h"
 
-struct prom_collector
-{
-    const char* name;
-    prom_map_t* metrics;
-    prom_collect_fn* collect_fn;
-    prom_string_builder_t* string_builder;
-    const char* proc_limits_file_path;
-    const char* proc_stat_file_path;
+struct prom_collector {
+  const char *name;
+  prom_map_t *metrics;
+  prom_collect_fn *collect_fn;
+  prom_string_builder_t *string_builder;
+  const char *proc_limits_file_path;
+  const char *proc_stat_file_path;
 };
 
-#endif // PROM_COLLECTOR_T_H
+#endif  // PROM_COLLECTOR_T_H

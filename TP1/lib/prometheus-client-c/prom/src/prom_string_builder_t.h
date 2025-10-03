@@ -23,4 +23,4 @@ struct prom_string_builder;
  */
 typedef struct prom_string_builder prom_string_builder_t;
 
-#endif // PROM_STRING_BUILDER_T_H
+#endif  // PROM_STRING_BUILDER_T_H

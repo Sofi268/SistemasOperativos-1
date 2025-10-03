@@ -23,6 +23,6 @@
 #define PROM_LOG(msg) printf("%s %s %s %s %d %s\n", __DATE__, __TIME__, __FILE__, __FUNCTION__, __LINE__, msg);
 #else
 #define PROM_LOG(msg)
-#endif // PROM_LOG_ENABLE
+#endif  // PROM_LOG_ENABLE
 
-#endif // PROM_LOG_H
+#endif  // PROM_LOG_H

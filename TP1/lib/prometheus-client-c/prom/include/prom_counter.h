@@ -53,7 +53,7 @@ typedef prom_metric_t prom_counter_t;
  *     // An example without labels
  *     prom_counter_new("foo", "foo is a counter without labels", 0, NULL);
  */
-prom_counter_t* prom_counter_new(const char* name, const char* help, size_t label_key_count, const char** label_keys);
+prom_counter_t *prom_counter_new(const char *name, const char *help, size_t label_key_count, const char **label_keys);
 
 /**
  * @brief Destroys a prom_counter_t*. You must set self to NULL after destruction. A non-zero integer value will be
@@ -61,7 +61,7 @@ prom_counter_t* prom_counter_new(const char* name, const char* help, size_t labe
  * @param self A prom_counter_t*
  * @return A non-zero integer value upon failure.
  */
-int prom_counter_destroy(prom_counter_t* self);
+int prom_counter_destroy(prom_counter_t *self);
 
 /**
  * @brief Increment the prom_counter_t by 1. A non-zero integer value will be returned on failure.
@@ -79,7 +79,7 @@ int prom_counter_destroy(prom_counter_t* self);
  *     // An example without labels
  *     prom_counter_inc(foo_counter, NULL);
  */
-int prom_counter_inc(prom_counter_t* self, const char** label_values);
+int prom_counter_inc(prom_counter_t *self, const char **label_values);
 
 /**
  * @brief Add the value to the prom_counter_t*. A non-zero integer value will be returned on failure.
@@ -98,6 +98,6 @@ int prom_counter_inc(prom_counter_t* self, const char** label_values);
  *     // An example without labels
  *     prom_counter_add(foo_counter, 22, NULL);
  */
-int prom_counter_add(prom_counter_t* self, double r_value, const char** label_values);
+int prom_counter_add(prom_counter_t *self, double r_value, const char **label_values);
 
-#endif // PROM_COUNTER_H
+#endif  // PROM_COUNTER_H

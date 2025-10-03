@@ -28,84 +28,72 @@
 #include "prom_log.h"
 #include "prom_procfs_i.h"
 
-static int prom_procfs_ensure_buf_size(prom_procfs_buf_t* self)
-{
-    PROM_ASSERT(self != NULL);
-    if (self->allocated >= self->size + 1)
-        return 0;
-    while (self->allocated < self->size + 1)
-        self->allocated <<= 1;
-    self->buf = (char*)prom_realloc(self->buf, self->allocated);
-    return 0;
+static int prom_procfs_ensure_buf_size(prom_procfs_buf_t *self) {
+  PROM_ASSERT(self != NULL);
+  if (self->allocated >= self->size + 1) return 0;
+  while (self->allocated < self->size + 1) self->allocated <<= 1;
+  self->buf = (char *)prom_realloc(self->buf, self->allocated);
+  return 0;
 }
 
-prom_procfs_buf_t* prom_procfs_buf_new(const char* path)
-{
-    int r = 0;
+prom_procfs_buf_t *prom_procfs_buf_new(const char *path) {
+  int r = 0;
 
-    FILE* f = fopen(path, "r");
-    char errbuf[100];
+  FILE *f = fopen(path, "r");
+  char errbuf[100];
 
-    if (f == NULL)
-    {
-        strerror_r(errno, errbuf, 100);
-        PROM_LOG(errbuf);
-        return NULL;
-    }
+  if (f == NULL) {
+    strerror_r(errno, errbuf, 100);
+    PROM_LOG(errbuf);
+    return NULL;
+  }
 
-#define PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f)                                                                          \
-    r = fclose(f);                                                                                                     \
-    if (r)                                                                                                             \
-    {                                                                                                                  \
-        strerror_r(errno, errbuf, 100);                                                                                \
-        PROM_LOG(errbuf);                                                                                              \
-    }
+#define PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f) \
+  r = fclose(f);                              \
+  if (r) {                                    \
+    strerror_r(errno, errbuf, 100);           \
+    PROM_LOG(errbuf);                         \
+  }
 
-    unsigned short int initial_size = 32;
-    prom_procfs_buf_t* self = prom_malloc(sizeof(prom_procfs_buf_t));
-    self->buf = prom_malloc(initial_size);
-    self->size = 0;
-    self->index = 0;
-    self->allocated = initial_size;
+  unsigned short int initial_size = 32;
+  prom_procfs_buf_t *self = prom_malloc(sizeof(prom_procfs_buf_t));
+  self->buf = prom_malloc(initial_size);
+  self->size = 0;
+  self->index = 0;
+  self->allocated = initial_size;
 
-    for (int current_char = getc(f), i = 0; current_char != EOF; current_char = getc(f), i++)
-    {
-        r = prom_procfs_ensure_buf_size(self);
-        if (r)
-        {
-            prom_procfs_buf_destroy(self);
-            self = NULL;
-            PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f);
-            return NULL;
-        }
-        self->buf[i] = current_char;
-        self->size++;
-    }
+  for (int current_char = getc(f), i = 0; current_char != EOF; current_char = getc(f), i++) {
     r = prom_procfs_ensure_buf_size(self);
-    if (r)
-    {
-        prom_procfs_buf_destroy(self);
-        self = NULL;
-        PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f);
-        return NULL;
+    if (r) {
+      prom_procfs_buf_destroy(self);
+      self = NULL;
+      PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f);
+      return NULL;
     }
-
-    self->buf[self->size] = '\0';
+    self->buf[i] = current_char;
     self->size++;
-
+  }
+  r = prom_procfs_ensure_buf_size(self);
+  if (r) {
+    prom_procfs_buf_destroy(self);
+    self = NULL;
     PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f);
-    if (r)
-        return NULL;
-    return self;
+    return NULL;
+  }
+
+  self->buf[self->size] = '\0';
+  self->size++;
+
+  PROM_PROCFS_BUF_NEW_HANDLE_F_CLOSE(f);
+  if (r) return NULL;
+  return self;
 }
 
-int prom_procfs_buf_destroy(prom_procfs_buf_t* self)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 0;
-    prom_free(self->buf);
-    prom_free(self);
-    self = NULL;
-    return 0;
+int prom_procfs_buf_destroy(prom_procfs_buf_t *self) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 0;
+  prom_free(self->buf);
+  prom_free(self);
+  self = NULL;
+  return 0;
 }

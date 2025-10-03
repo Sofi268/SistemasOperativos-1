@@ -24,10 +24,9 @@ limitations under the License.
 #ifndef PROM_HISTOGRAM_BUCKETS_H
 #define PROM_HISTOGRAM_BUCKETS_H
 
-typedef struct prom_histogram_buckets
-{
-    int count;                  /**< Number of buckets */
-    const double* upper_bounds; /**< The bucket values */
+typedef struct prom_histogram_buckets {
+  int count;                  /**< Number of buckets */
+  const double *upper_bounds; /**< The bucket values */
 } prom_histogram_buckets_t;
 
 /**
@@ -37,12 +36,12 @@ typedef struct prom_histogram_buckets
  *               passed as count.
  * @return The constructed prom_histogram_buckets_t*
  */
-prom_histogram_buckets_t* prom_histogram_buckets_new(size_t count, double bucket, ...);
+prom_histogram_buckets_t *prom_histogram_buckets_new(size_t count, double bucket, ...);
 
 /**
  * @brief the default histogram buckets: .005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10
  */
-extern prom_histogram_buckets_t* prom_histogram_default_buckets;
+extern prom_histogram_buckets_t *prom_histogram_default_buckets;
 
 /**
  *@brief Construct a linearly sized prom_histogram_buckets_t*
@@ -51,7 +50,7 @@ extern prom_histogram_buckets_t* prom_histogram_default_buckets;
  * @param count The total number of buckets. The final +Inf bucket is not counted and not included.
  * @return The constructed prom_histogram_buckets_t*
  */
-prom_histogram_buckets_t* prom_histogram_buckets_linear(double start, double width, size_t count);
+prom_histogram_buckets_t *prom_histogram_buckets_linear(double start, double width, size_t count);
 
 /**
  * @brief Construct an exponentially sized prom_histogram_buckets_t*
@@ -62,7 +61,7 @@ prom_histogram_buckets_t* prom_histogram_buckets_linear(double start, double wid
  *              greater than or equal to 1
  * @return The constructed prom_histogram_buckets_t*
  */
-prom_histogram_buckets_t* prom_histogram_buckets_exponential(double start, double factor, size_t count);
+prom_histogram_buckets_t *prom_histogram_buckets_exponential(double start, double factor, size_t count);
 
 /**
  * @brief Destroy a prom_histogram_buckets_t*. Self MUST be set to NULL after destruction. Returns a non-zero integer
@@ -70,13 +69,13 @@ prom_histogram_buckets_t* prom_histogram_buckets_exponential(double start, doubl
  * @param self The target prom_histogram_buckets_t*
  * @return Non-zero integer value upon failure
  */
-int prom_histogram_buckets_destroy(prom_histogram_buckets_t* self);
+int prom_histogram_buckets_destroy(prom_histogram_buckets_t *self);
 
 /**
  * @brief Get the count of buckets
  * @param self The target prom_histogram_buckets_t*
  * @return The count of buckets
  */
-size_t prom_histogram_buckets_count(prom_histogram_buckets_t* self);
+size_t prom_histogram_buckets_count(prom_histogram_buckets_t *self);
 
-#endif // PROM_HISTOGRAM_BUCKETS_H
+#endif  // PROM_HISTOGRAM_BUCKETS_H

@@ -20,26 +20,24 @@
 #include "prom_gauge.h"
 #include "prom_procfs_t.h"
 
-extern prom_gauge_t* prom_process_open_fds;
-extern prom_gauge_t* prom_process_max_fds;
-extern prom_gauge_t* prom_process_virtual_memory_max_bytes;
+extern prom_gauge_t *prom_process_open_fds;
+extern prom_gauge_t *prom_process_max_fds;
+extern prom_gauge_t *prom_process_virtual_memory_max_bytes;
 
-typedef struct prom_process_limits_row
-{
-    const char* limit; /**< Pointer to a string */
-    int soft;          /**< Soft value */
-    int hard;          /**< Hard value */
-    const char* units; /**< Units  */
+typedef struct prom_process_limits_row {
+  const char *limit; /**< Pointer to a string */
+  int soft;          /**< Soft value */
+  int hard;          /**< Hard value */
+  const char *units; /**< Units  */
 } prom_process_limits_row_t;
 
-typedef struct prom_process_limits_current_row
-{
-    char* limit; /**< Pointer to a string */
-    int soft;    /**< Soft value */
-    int hard;    /**< Hard value */
-    char* units; /**< Units  */
+typedef struct prom_process_limits_current_row {
+  char *limit; /**< Pointer to a string */
+  int soft;    /**< Soft value */
+  int hard;    /**< Hard value */
+  char *units; /**< Units  */
 } prom_process_limits_current_row_t;
 
 typedef prom_procfs_buf_t prom_process_limits_file_t;
 
-#endif // PROM_PROCESS_T_H
+#endif  // PROM_PROCESS_T_H

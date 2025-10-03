@@ -34,7 +34,7 @@
  * @param active_registery The target prom_collector_registry_t*. If null is passed, the default registry is used.
  *                         The registry MUST be initialized.
  */
-void promhttp_set_active_collector_registry(prom_collector_registry_t* active_registry);
+void promhttp_set_active_collector_registry(prom_collector_registry_t *active_registry);
 
 /**
  *  @brief Starts a daemon in the background and returns a pointer to an HMD_Daemon.
@@ -44,5 +44,5 @@ void promhttp_set_active_collector_registry(prom_collector_registry_t* active_re
  *
  * @return struct MHD_Daemon*
  */
-struct MHD_Daemon* promhttp_start_daemon(unsigned int flags, unsigned short port, MHD_AcceptPolicyCallback apc,
-                                         void* apc_cls);
+struct MHD_Daemon *promhttp_start_daemon(unsigned int flags, unsigned short port, MHD_AcceptPolicyCallback apc,
+                                         void *apc_cls);

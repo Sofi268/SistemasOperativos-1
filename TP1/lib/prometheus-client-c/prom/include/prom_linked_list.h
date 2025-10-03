@@ -25,4 +25,4 @@ struct prom_linked_list;
  */
 typedef struct prom_linked_list prom_linked_list_t;
 
-#endif // PROM_LIST_H
+#endif  // PROM_LIST_H

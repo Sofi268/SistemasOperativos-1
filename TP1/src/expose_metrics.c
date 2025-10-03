@@ -77,6 +77,31 @@ static prom_gauge_t* inactive_time_metric;
 /** Métrica de Prometheus para el tiempo de espera de entrada/salida de la CPU */
 static prom_gauge_t* io_wait_metric;
 
+/** Métrica de Prometheus para el tiempo de espera de entrada/salida de la CPU */
+static prom_gauge_t* fragmentation_rate;
+
+/** Métrica de Prometheus para la memoria RAM residente (RSS) */
+static prom_gauge_t* resident_memory_metric;
+
+/** Métrica de Prometheus para la memoria virtual */
+static prom_gauge_t* virtual_memory_metric;
+
+/** Métrica de Prometheus para el tamaño actual del heap */
+static prom_gauge_t* heap_size_metric;
+
+/** Métrica de Prometheus para el tiempo promedio de malloc */
+static prom_gauge_t* avg_malloc_time_metric;
+
+/** Métrica de Prometheus para el tiempo promedio de free */
+static prom_gauge_t* avg_free_time_metric;
+
+/** Métrica de Prometheus para el tiempo promedio de realloc */
+static prom_gauge_t* avg_realloc_time_metric;
+
+/** Métrica de Prometheus para el tiempo promedio de calloc */
+static prom_gauge_t* avg_calloc_time_metric;
+
+
 void update_cpu_gauge()
 {
     double usage = get_cpu_usage();
@@ -437,6 +462,106 @@ void update_IO_wait()
     }
 }
 
+void update_fragmentation_rate()
+{
+    double frag = get_fragmentation_rate();
+    if (frag >= 0)
+    {
+        pthread_mutex_lock(&lock);
+        prom_gauge_set(fragmentation_rate, frag, NULL);
+        pthread_mutex_unlock(&lock);
+    }
+    else
+    {
+        fprintf(stderr, "Error al obtener la tasa de fragmentacion\n");
+    }
+}
+
+void update_resident_memory()
+{
+    double rss = get_resident_memory();
+    if (rss >= 0)
+    {
+        pthread_mutex_lock(&lock);
+        prom_gauge_set(resident_memory_metric, rss, NULL);
+        pthread_mutex_unlock(&lock);
+    }
+    else
+    {
+        fprintf(stderr, "Error al obtener la memoria residente (RSS)\n");
+    }
+}
+
+void update_virtual_memory()
+{
+    double vmem = get_virtual_memory();
+    if (vmem >= 0)
+    {
+        pthread_mutex_lock(&lock);
+        prom_gauge_set(virtual_memory_metric, vmem, NULL);
+        pthread_mutex_unlock(&lock);
+    }
+    else
+    {
+        fprintf(stderr, "Error al obtener la memoria virtual\n");
+    }
+}
+
+void update_heap_size()
+{
+    double heap = get_heap_size();
+    if (heap >= 0)
+    {
+        pthread_mutex_lock(&lock);
+        prom_gauge_set(heap_size_metric, heap, NULL);
+        pthread_mutex_unlock(&lock);
+    }
+    else
+    {
+        fprintf(stderr, "Error al obtener el tamaño del heap\n");
+    }
+}
+
+void update_avg_malloc_time(unsigned long long elapsed_time)
+{
+    pthread_mutex_lock(&lock);
+    total_malloc_time += elapsed_time;
+    malloc_calls++;
+    double avg = (double) total_malloc_time / malloc_calls;
+    prom_gauge_set(avg_malloc_time_metric, avg, NULL);
+    pthread_mutex_unlock(&lock);
+}
+
+void update_avg_free_time(unsigned long long elapsed_time)
+{
+    pthread_mutex_lock(&lock);
+    total_free_time += elapsed_time;
+    free_calls++;
+    double avg = (double) total_free_time / free_calls;
+    prom_gauge_set(avg_free_time_metric, avg, NULL);
+    pthread_mutex_unlock(&lock);
+}
+
+void update_avg_realloc_time(unsigned long long elapsed_time)
+{
+    pthread_mutex_lock(&lock);
+    total_realloc_time += elapsed_time;
+    realloc_calls++;
+    double avg = (double) total_realloc_time / realloc_calls;
+    prom_gauge_set(avg_realloc_time_metric, avg, NULL);
+    pthread_mutex_unlock(&lock);
+}
+
+void update_avg_calloc_time(unsigned long long elapsed_time)
+{
+    pthread_mutex_lock(&lock);
+    total_calloc_time += elapsed_time;
+    calloc_calls++;
+    double avg = (double) total_calloc_time / calloc_calls;
+    prom_gauge_set(avg_calloc_time_metric, avg, NULL);
+    pthread_mutex_unlock(&lock);
+}
+
 void* expose_metrics(void* arg)
 {
     (void)arg; // Argumento no utilizado
@@ -479,177 +604,226 @@ void init_metrics()
         return;
     }
 
-    // Creamos la métrica para el uso de CPU
-    cpu_usage_metric = prom_gauge_new("cpu_usage_percentage", "Porcentaje de uso de CPU", 0, NULL);
-    if (cpu_usage_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de uso de CPU\n");
-        return;
-    }
+    // // Creamos la métrica para el uso de CPU
+    // cpu_usage_metric = prom_gauge_new("cpu_usage_percentage", "Porcentaje de uso de CPU", 0, NULL);
+    // if (cpu_usage_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de uso de CPU\n");
+    //     return;
+    // }
 
-    // Creamos la métrica para el uso de memoria
-    memory_usage_metric = prom_gauge_new("memory_usage_percentage", "Porcentaje de uso de memoria", 0, NULL);
-    if (memory_usage_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de uso de memoria\n");
-        return;
-    }
+    // // Creamos la métrica para el uso de memoria
+    // memory_usage_metric = prom_gauge_new("memory_usage_percentage", "Porcentaje de uso de memoria", 0, NULL);
+    // if (memory_usage_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de uso de memoria\n");
+    //     return;
+    // }
 
-    // Creamos la métrica para la memoria disponible
-    free_memory_metric = prom_gauge_new("free_memory_metric", "Memoria Disponible", 0, NULL);
-    if (free_memory_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de memoria disponible\n");
-        return;
-    }
+    // // Creamos la métrica para la memoria disponible
+    // free_memory_metric = prom_gauge_new("free_memory_metric", "Memoria Disponible", 0, NULL);
+    // if (free_memory_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de memoria disponible\n");
+    //     return;
+    // }
 
-    // Creamos la métrica para el uso de memoria
-    used_memory_metric = prom_gauge_new("used_memory_metric", "Memoria en Uso", 0, NULL);
-    if (used_memory_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de memoria en uso\n");
-        return;
-    }
+    // // Creamos la métrica para el uso de memoria
+    // used_memory_metric = prom_gauge_new("used_memory_metric", "Memoria en Uso", 0, NULL);
+    // if (used_memory_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de memoria en uso\n");
+    //     return;
+    // }
 
-    // Creamos la métrica para la memoria total
-    total_memory_metric = prom_gauge_new("total_memory_metric", "Memoria Total", 0, NULL);
-    if (total_memory_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de memoria total\n");
-        return;
-    }
+    // // Creamos la métrica para la memoria total
+    // total_memory_metric = prom_gauge_new("total_memory_metric", "Memoria Total", 0, NULL);
+    // if (total_memory_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de memoria total\n");
+    //     return;
+    // }
 
-    // Creamos la métrica para las lecturas de disco SSD
-    disk_reads_metric = prom_gauge_new("disk_reads_metric", "Lecturas de Disco Total", 0, NULL);
-    if (disk_reads_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de lecturas de disco total\n");
-        return;
-    }
+    // // Creamos la métrica para las lecturas de disco SSD
+    // disk_reads_metric = prom_gauge_new("disk_reads_metric", "Lecturas de Disco Total", 0, NULL);
+    // if (disk_reads_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de lecturas de disco total\n");
+    //     return;
+    // }
 
-    loop_reads_metric = prom_gauge_new("loop_reads_metric", "Lecturas de Dispositivos de Montaje de archivos", 0, NULL);
-    if (loop_reads_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de lecturas de dispositivos de montaje \n");
-        return;
-    }
+    // loop_reads_metric = prom_gauge_new("loop_reads_metric", "Lecturas de Dispositivos de Montaje de archivos", 0, NULL);
+    // if (loop_reads_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de lecturas de dispositivos de montaje \n");
+    //     return;
+    // }
 
-    disk_writes_metric = prom_gauge_new("disk_writes_metric", "Escrituras de Disco Total", 0, NULL);
-    if (disk_writes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de escrituras de disco total\n");
-        return;
-    }
+    // disk_writes_metric = prom_gauge_new("disk_writes_metric", "Escrituras de Disco Total", 0, NULL);
+    // if (disk_writes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de escrituras de disco total\n");
+    //     return;
+    // }
 
-    loop_writes_metric = prom_gauge_new("loop_writes_metric", "Escrituras de Dispositivos de montaje", 0, NULL);
-    if (loop_writes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de escrituras de dispositivos de montaje\n");
-        return;
-    }
+    // loop_writes_metric = prom_gauge_new("loop_writes_metric", "Escrituras de Dispositivos de montaje", 0, NULL);
+    // if (loop_writes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de escrituras de dispositivos de montaje\n");
+    //     return;
+    // }
 
-    time_reads_metric = prom_gauge_new("times_reads_metric", "Tiempos de lectura de dispositivos", 0, NULL);
-    if (time_reads_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de tiempo de lectura de los dispositivos \n");
-        return;
-    }
+    // time_reads_metric = prom_gauge_new("times_reads_metric", "Tiempos de lectura de dispositivos", 0, NULL);
+    // if (time_reads_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de tiempo de lectura de los dispositivos \n");
+    //     return;
+    // }
 
-    time_writes_metric = prom_gauge_new("times_writes_metric", "Tiempo de escritura de dispositivos", 0, NULL);
-    if (time_writes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de escritura de los dispositivos \n");
-        return;
-    }
+    // time_writes_metric = prom_gauge_new("times_writes_metric", "Tiempo de escritura de dispositivos", 0, NULL);
+    // if (time_writes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de escritura de los dispositivos \n");
+    //     return;
+    // }
 
-    IO_in_progress_metric = prom_gauge_new("IO_in_progress_metric", "Cantidad de operaciones de E/S", 0, NULL);
-    if (IO_in_progress_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de cantidad de operaciones de E/S \n");
-        return;
-    }
+    // IO_in_progress_metric = prom_gauge_new("IO_in_progress_metric", "Cantidad de operaciones de E/S", 0, NULL);
+    // if (IO_in_progress_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de cantidad de operaciones de E/S \n");
+    //     return;
+    // }
 
-    time_IO_metric = prom_gauge_new("time_IO_metric", "Tiempo de operaciones de E/S", 0, NULL);
-    if (time_IO_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica tiempo de operaciones de E/S \n");
-        return;
-    }
+    // time_IO_metric = prom_gauge_new("time_IO_metric", "Tiempo de operaciones de E/S", 0, NULL);
+    // if (time_IO_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica tiempo de operaciones de E/S \n");
+    //     return;
+    // }
 
-    num_processes_metric = prom_gauge_new("num_processes_metric", "Cantidad de procesos en ejecución", 0, NULL);
-    if (num_processes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de procesos en ejecución\n");
-        return;
-    }
+    // num_processes_metric = prom_gauge_new("num_processes_metric", "Cantidad de procesos en ejecución", 0, NULL);
+    // if (num_processes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de procesos en ejecución\n");
+    //     return;
+    // }
 
-    received_bytes_metric = prom_gauge_new("received_bytes_metric", "Cantidad de bytes recibidos", 0, NULL);
-    if (received_bytes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de bytes recibidos\n");
-        return;
-    }
+    // received_bytes_metric = prom_gauge_new("received_bytes_metric", "Cantidad de bytes recibidos", 0, NULL);
+    // if (received_bytes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de bytes recibidos\n");
+    //     return;
+    // }
 
-    sent_bytes_metric = prom_gauge_new("sent_bytes_metric", "Cantidad de bytes enviados", 0, NULL);
-    if (sent_bytes_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de bytes enviados\n");
-        return;
-    }
+    // sent_bytes_metric = prom_gauge_new("sent_bytes_metric", "Cantidad de bytes enviados", 0, NULL);
+    // if (sent_bytes_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de bytes enviados\n");
+    //     return;
+    // }
 
-    received_packets_metric = prom_gauge_new("received_packets_metric", "Cantidad de paquetes recibidos", 0, NULL);
-    if (received_packets_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de paquetes recibidos\n");
-        return;
-    }
+    // received_packets_metric = prom_gauge_new("received_packets_metric", "Cantidad de paquetes recibidos", 0, NULL);
+    // if (received_packets_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de paquetes recibidos\n");
+    //     return;
+    // }
 
-    sent_packets_metric = prom_gauge_new("sent_packets_metric", "Cantidad de paquetes enviados", 0, NULL);
-    if (sent_packets_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de paquetes enviados\n");
-        return;
-    }
+    // sent_packets_metric = prom_gauge_new("sent_packets_metric", "Cantidad de paquetes enviados", 0, NULL);
+    // if (sent_packets_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de paquetes enviados\n");
+    //     return;
+    // }
 
-    received_errors_metric = prom_gauge_new("received_errors_metric", "Cantidad de errores de recepción", 0, NULL);
-    if (received_errors_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de errores de recepción\n");
-        return;
-    }
+    // received_errors_metric = prom_gauge_new("received_errors_metric", "Cantidad de errores de recepción", 0, NULL);
+    // if (received_errors_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de errores de recepción\n");
+    //     return;
+    // }
 
-    sent_errors_metric = prom_gauge_new("sent_errors_metric", "Cantidad de errores de envío", 0, NULL);
-    if (sent_errors_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de errores de envío\n");
-        return;
-    }
+    // sent_errors_metric = prom_gauge_new("sent_errors_metric", "Cantidad de errores de envío", 0, NULL);
+    // if (sent_errors_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de errores de envío\n");
+    //     return;
+    // }
 
-    user_time_metric = prom_gauge_new("user_time_metric", "Tiempo de CPU en modo usuario", 0, NULL);
-    if (user_time_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de tiempo de CPU en modo usuario\n");
-        return;
-    }
+    // user_time_metric = prom_gauge_new("user_time_metric", "Tiempo de CPU en modo usuario", 0, NULL);
+    // if (user_time_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de tiempo de CPU en modo usuario\n");
+    //     return;
+    // }
 
-    kernel_time_metric = prom_gauge_new("kernel_time_metric", "Tiempo de CPU en modo kernel", 0, NULL);
-    if (kernel_time_metric == NULL)
-    {
-        fprintf(stderr, "Error al crear la métrica de tiempo de CPU en modo kernel\n");
-        return;
-    }
+    // kernel_time_metric = prom_gauge_new("kernel_time_metric", "Tiempo de CPU en modo kernel", 0, NULL);
+    // if (kernel_time_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de tiempo de CPU en modo kernel\n");
+    //     return;
+    // }
 
-    inactive_time_metric = prom_gauge_new("inactive_time_metric", "Tiempo de inactividad de la CPU", 0, NULL);
+    // inactive_time_metric = prom_gauge_new("inactive_time_metric", "Tiempo de inactividad de la CPU", 0, NULL);
+    // if (inactive_time_metric == NULL)
+    // {
+    //     fprintf(stderr, "Error al crear la métrica de tiempo de inactividad de la CPU\n");
+    //     return;
+    // }
+
+    fragmentation_rate = prom_gauge_new("fragmentation_rate_metric", "Tasa de fragmentacion de memoria", 0, NULL);
     if (inactive_time_metric == NULL)
     {
-        fprintf(stderr, "Error al crear la métrica de tiempo de inactividad de la CPU\n");
+        fprintf(stderr, "Error al crear la métrica de fragmentacion de memoria\n");
         return;
     }
 
-    io_wait_metric = prom_gauge_new("io_wait_metric", "Tiempo de espera de entrada/salida de la CPU", 0, NULL);
-    if (io_wait_metric == NULL)
+    resident_memory_metric = prom_gauge_new("resident_memory_metric", "Memoria RAM residente (RSS) en KB", 0, NULL);
+    if (resident_memory_metric == NULL)
     {
-        fprintf(stderr, "Error al crear la métrica de tiempo de espera de I/O\n");
+        fprintf(stderr, "Error al crear la métrica de memoria residente\n");
+        return;
+    }
+
+    virtual_memory_metric = prom_gauge_new("virtual_memory_metric", "Memoria virtual utilizada en KB", 0, NULL);
+    if (virtual_memory_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de memoria virtual\n");
+        return;
+    }
+
+    heap_size_metric = prom_gauge_new("heap_size_metric", "Tamaño actual del heap en bytes", 0, NULL);
+    if (heap_size_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de tamaño del heap\n");
+        return;
+    }
+
+    avg_malloc_time_metric = prom_gauge_new("avg_malloc_time_metric", "Tiempo promedio de ejecución de malloc en ns", 0, NULL);
+    if (avg_malloc_time_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de tiempo promedio de malloc\n");
+        return;
+    }
+
+    avg_free_time_metric = prom_gauge_new("avg_free_time_metric", "Tiempo promedio de ejecución de free en ns", 0, NULL);
+    if (avg_free_time_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de tiempo promedio de free\n");
+        return;
+    }
+
+    avg_realloc_time_metric = prom_gauge_new("avg_realloc_time_metric", "Tiempo promedio de ejecución de realloc en ns", 0, NULL);
+    if (avg_realloc_time_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de tiempo promedio de realloc\n");
+        return;
+    }
+
+    avg_calloc_time_metric = prom_gauge_new("avg_calloc_time_metric", "Tiempo promedio de ejecución de calloc en ns", 0, NULL);
+    if (avg_calloc_time_metric == NULL)
+    {
+        fprintf(stderr, "Error al crear la métrica de tiempo promedio de calloc\n");
         return;
     }
 
@@ -664,56 +838,83 @@ void init_metrics()
 
 bool registroMetricas()
 {
-    if (prom_collector_registry_must_register_metric(cpu_usage_metric) == NULL)
+    // if (prom_collector_registry_must_register_metric(cpu_usage_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(memory_usage_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(free_memory_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(used_memory_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(total_memory_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(disk_reads_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(loop_reads_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(disk_writes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(loop_writes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(time_reads_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(time_writes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(IO_in_progress_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(time_IO_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(num_processes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(received_bytes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(sent_bytes_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(received_packets_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(sent_packets_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(received_errors_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(sent_errors_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(user_time_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(kernel_time_metric) == NULL)
+    //     return true;
+    // if (prom_collector_registry_must_register_metric(inactive_time_metric) == NULL)
+    //     return true;
+        if (prom_collector_registry_must_register_metric(fragmentation_rate) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(memory_usage_metric) == NULL)
+    if (prom_collector_registry_must_register_metric(resident_memory_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(free_memory_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(virtual_memory_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(used_memory_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(heap_size_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(total_memory_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(avg_malloc_time_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(disk_reads_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(avg_free_time_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(loop_reads_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(avg_realloc_time_metric) == NULL)
         return true;
-    if (prom_collector_registry_must_register_metric(disk_writes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(loop_writes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(time_reads_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(time_writes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(IO_in_progress_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(time_IO_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(num_processes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(received_bytes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(sent_bytes_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(received_packets_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(sent_packets_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(received_errors_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(sent_errors_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(user_time_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(kernel_time_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(inactive_time_metric) == NULL)
-        return true;
-    if (prom_collector_registry_must_register_metric(io_wait_metric) == NULL)
+
+    if (prom_collector_registry_must_register_metric(avg_calloc_time_metric) == NULL)
         return true;
 
     return false;
+}
+
+void update_metrics(){
+    update_resident_memory();
+    update_virtual_memory();
+    update_heap_size();
+    update_fragmentation_rate();
 }
 
 void destroy_mutex()

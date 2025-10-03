@@ -27,23 +27,23 @@
  * @param l_value The entire left value of the metric e.g metric_name{foo="bar"}
  * @param r_value A double representing the value of the sample
  */
-prom_metric_sample_t* prom_metric_sample_new(prom_metric_type_t type, const char* l_value, double r_value);
+prom_metric_sample_t *prom_metric_sample_new(prom_metric_type_t type, const char *l_value, double r_value);
 
 /**
  * @brief API PRIVATE Destroy the prom_metric_sample**
  */
-int prom_metric_sample_destroy(prom_metric_sample_t* self);
+int prom_metric_sample_destroy(prom_metric_sample_t *self);
 
 /**
  * @brief API PRIVATE A prom_linked_list_free_item_fn to enable item destruction within a linked list's destructor
  */
-int prom_metric_sample_destroy_generic(void*);
+int prom_metric_sample_destroy_generic(void *);
 
 /**
  * @brief API PRIVATE A prom_linked_list_free_item_fn to enable item destruction within a linked list's destructor.
  *
  * This function ignores any errors.
  */
-void prom_metric_sample_free_generic(void* gen);
+void prom_metric_sample_free_generic(void *gen);
 
-#endif // PROM_METRIC_SAMPLE_I_H
+#endif  // PROM_METRIC_SAMPLE_I_H

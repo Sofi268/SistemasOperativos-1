@@ -1,5 +1,6 @@
 #include "metrics.h"
 
+
 double get_memory_usage()
 {
     FILE* fp;
@@ -827,4 +828,124 @@ double get_IO_wait()
     fclose(fp);
 
     return io_time;
+}
+
+double get_resident_memory(){
+    FILE* fp;
+    char buffer[BUFFER_SIZE];
+    unsigned long rss = 0;
+
+    fp = fopen("/proc/self/statm", "r");
+    if (fp == NULL)
+    {
+        perror("Error al abrir /proc/self/statm");
+        return -1;
+    }
+
+    if (fgets(buffer, sizeof(buffer), fp) != NULL)
+    {
+        unsigned long size, resident;
+        if (sscanf(buffer, "%lu %lu", &size, &resident) == 2)
+        {
+            rss = resident * (getpagesize() / 1024); // convertir a KB
+        }
+    }
+
+    fclose(fp);
+    return (double)rss;
+}
+
+double get_virtual_memory(){
+    FILE* fp;
+    char buffer[BUFFER_SIZE];
+    unsigned long virt = 0;
+
+    fp = fopen("/proc/self/statm", "r");
+    if (fp == NULL)
+    {
+        perror("Error al abrir /proc/self/statm");
+        return -1;
+    }
+
+    if (fgets(buffer, sizeof(buffer), fp) != NULL)
+    {
+        unsigned long size;
+        if (sscanf(buffer, "%lu", &size) == 1)
+        {
+            virt = size * (getpagesize() / 1024); // convertir a KB
+        }
+    }
+
+    fclose(fp);
+    return (double)virt;
+}
+
+double get_heap_size(){
+    FILE* fp;
+    char buffer[BUFFER_SIZE];
+    unsigned long start_brk = 0, end_brk = 0;
+    fp = fopen("/proc/self/status", "r");
+    if (fp == NULL)
+    {
+        perror("Error al abrir /proc/self/status");
+        return -1;
+    }
+
+    while (fgets(buffer, sizeof(buffer), fp) != NULL)
+    {
+        if (sscanf(buffer, "VmData: %lu", &end_brk) == 1) // VmData ≈ heap
+        {
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    return (double)end_brk * 1024; // KB → bytes
+}
+
+double get_avg_malloc_time() {
+    return (malloc_calls == 0) ? 0.0 :
+           (double) total_malloc_time / malloc_calls;
+}
+
+double get_avg_free_time() {
+    return (free_calls == 0) ? 0.0 :
+           (double) total_free_time / free_calls;
+}
+
+double get_avg_realloc_time() {
+    return (realloc_calls == 0) ? 0.0 :
+           (double) total_realloc_time / realloc_calls;
+}
+
+double get_avg_calloc_time() {
+    return (calloc_calls == 0) ? 0.0 :
+           (double) total_calloc_time / calloc_calls;
+}
+
+static inline unsigned long long diff_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000ULL +
+           (end.tv_nsec - start.tv_nsec);
+}
+
+// ==== Setters ====
+void add_malloc_time(unsigned long long ns) {
+    total_malloc_time += ns;
+    malloc_calls++;
+}
+
+void add_free_time(unsigned long long ns) {
+    total_free_time += ns;
+    free_calls++;
+}
+
+void add_realloc_time(unsigned long long ns) {
+    total_realloc_time += ns;
+    realloc_calls++;
+}
+
+void add_calloc_time(unsigned long long ns) {
+    total_calloc_time += ns;
+    calloc_calls++;
 }

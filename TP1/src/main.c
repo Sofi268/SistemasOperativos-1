@@ -4,7 +4,6 @@
  */
 
 #include "expose_metrics.h"
-#include <stdbool.h>
 
 /**
  * @brief Tiempo de espera en segundos.
@@ -13,6 +12,17 @@
  */
 #define SLEEP_TIME 1
 
+#define NUM_PTRS 50
+#define MAX_SIZE 1024
+
+static void *ptrs[NUM_PTRS] = {0};
+static size_t sizes[NUM_PTRS] = {0};
+
+static inline unsigned long long diff_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000ULL +
+           (end.tv_nsec - start.tv_nsec);
+}
+
 /**
  * @brief Función principal del programa.
  *
@@ -20,10 +30,9 @@
  * @param argv Arreglo de cadenas que representan los argumentos.
  * @return int Código de salida del programa.
  */
-int main(int argc, char* argv[])
-{
+int main(void) {
+    int i = 0;
     init_metrics();
-    // Creamos un hilo para exponer las métricas vía HTTP
     pthread_t tid;
     if (pthread_create(&tid, NULL, expose_metrics, NULL) != 0)
     {
@@ -31,38 +40,61 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    // Setea la memoria total una vez
-    set_total_memory_gauge();
+    while (i<=10) {
+        int op = rand() % 4;  // 0=malloc, 1=free, 2=realloc, 3=calloc
+        int idx = rand() % NUM_PTRS;
+        size_t sz = (rand() % MAX_SIZE) + 32;
 
-    // Bucle principal para actualizar las métricas cada segundo
-    while (true)
-    {
-        update_cpu_gauge();
-        update_memory_gauge();
-        update_free_memory_gauge();
-        update_used_memory_gauge();
-        update_disk_reads();
-        update_loop_reads();
-        update_disk_writes();
-        update_loop_writes();
-        update_time_reads();
-        update_time_writes();
-        update_IO_in_progress();
-        update_time_in_IO();
-        update_num_processes();
-        update_received_bytes();
-        update_sent_bytes();
-        update_received_packets();
-        update_sent_packets();
-        update_received_errors();
-        update_sent_errors();
-        update_user_time();
-        update_kernel_time();
-        update_inactive_time();
-        update_IO_wait();
+        struct timespec start, end;
+        void *tmp;
 
+        switch (op) {
+            case 0: // malloc
+                clock_gettime(CLOCK_MONOTONIC, &start);
+                tmp = new_malloc(sz);
+                clock_gettime(CLOCK_MONOTONIC, &end);
+                if (ptrs[idx]) new_free(ptrs[idx]);
+                ptrs[idx] = tmp;
+                sizes[idx] = sz;
+                update_avg_malloc_time(diff_ns(start, end));
+                break;
+
+            case 1: // free
+                if (ptrs[idx]) {
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    new_free(ptrs[idx]);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+                    ptrs[idx] = NULL;
+                    sizes[idx] = 0;
+                    update_avg_free_time(diff_ns(start, end));
+                }
+                break;
+
+            case 2: // realloc
+                if (ptrs[idx]) {
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    tmp = new_realloc(ptrs[idx], sz);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+                    if (tmp) {
+                        ptrs[idx] = tmp;
+                        sizes[idx] = sz;
+                    }
+                    update_avg_realloc_time(diff_ns(start, end));
+                }
+                break;
+
+            case 3: // calloc
+                clock_gettime(CLOCK_MONOTONIC, &start);
+                tmp = new_calloc(1, sz);
+                clock_gettime(CLOCK_MONOTONIC, &end);
+                if (ptrs[idx]) new_free(ptrs[idx]);
+                ptrs[idx] = tmp;
+                sizes[idx] = sz;
+                update_avg_calloc_time(diff_ns(start, end));
+                break;
+        }
+        update_metrics();
+        i++;
         sleep(SLEEP_TIME);
     }
-
-    return EXIT_SUCCESS;
 }

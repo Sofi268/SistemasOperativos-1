@@ -57,15 +57,15 @@ typedef prom_metric_t prom_histogram_t;
  *     prom_histogram_buckets_t* buckets = prom_histogram_buckets_linear(5.0, 5.0, 10);
  *     prom_histogram_new("foo", "foo is a counter without labels", buckets, 0, NULL);
  */
-prom_histogram_t* prom_histogram_new(const char* name, const char* help, prom_histogram_buckets_t* buckets,
-                                     size_t label_key_count, const char** label_keys);
+prom_histogram_t *prom_histogram_new(const char *name, const char *help, prom_histogram_buckets_t *buckets,
+                                     size_t label_key_count, const char **label_keys);
 
 /**
  * @brief Destroy a prom_histogram_t*. self MUSTS be set to NULL after destruction. Returns a non-zero integer value
  *        upon failure.
  * @return Non-zero value upon failure.
  */
-int prom_histogram_destroy(prom_histogram_t* self);
+int prom_histogram_destroy(prom_histogram_t *self);
 
 /**
  * @brief Observe the prom_histogram_t given the value and labells
@@ -76,6 +76,6 @@ int prom_histogram_destroy(prom_histogram_t* self);
  *                   literal.
  * @return Non-zero value upon failure
  */
-int prom_histogram_observe(prom_histogram_t* self, double value, const char** label_values);
+int prom_histogram_observe(prom_histogram_t *self, double value, const char **label_values);
 
-#endif // PROM_HISTOGRAM_INCLUDED
+#endif  // PROM_HISTOGRAM_INCLUDED

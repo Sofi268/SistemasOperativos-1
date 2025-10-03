@@ -26,22 +26,22 @@
 /**
  * @brief API PRIVATE Create a pointer to a prom_metric_sample_histogram_t
  */
-prom_metric_sample_histogram_t* prom_metric_sample_histogram_new(const char* name, prom_histogram_buckets_t* buckets,
-                                                                 size_t label_count, const char** label_keys,
-                                                                 const char** label_vales);
+prom_metric_sample_histogram_t *prom_metric_sample_histogram_new(const char *name, prom_histogram_buckets_t *buckets,
+                                                                 size_t label_count, const char **label_keys,
+                                                                 const char **label_vales);
 
 /**
  * @brief API PRIVATE Destroy a prom_metric_sample_histogram_t
  */
-int prom_metric_sample_histogram_destroy(prom_metric_sample_histogram_t* self);
+int prom_metric_sample_histogram_destroy(prom_metric_sample_histogram_t *self);
 
 /**
  * @brief API PRIVATE Destroy a void pointer that is cast to a prom_metric_sample_histogram_t*
  */
-int prom_metric_sample_histogram_destroy_generic(void* gen);
+int prom_metric_sample_histogram_destroy_generic(void *gen);
 
-char* prom_metric_sample_histogram_bucket_to_str(double bucket);
+char *prom_metric_sample_histogram_bucket_to_str(double bucket);
 
-void prom_metric_sample_histogram_free_generic(void* gen);
+void prom_metric_sample_histogram_free_generic(void *gen);
 
-#endif // PROM_METRIC_HISTOGRAM_SAMPLE_I_H
+#endif  // PROM_METRIC_HISTOGRAM_SAMPLE_I_H

@@ -19,10 +19,10 @@
 
 #include "prom_process_stat_t.h"
 
-prom_process_stat_file_t* prom_process_stat_file_new(const char* path);
-int prom_process_stat_file_destroy(prom_process_stat_file_t* self);
-prom_process_stat_t* prom_process_stat_new(prom_process_stat_file_t* stat_f);
-int prom_process_stat_destroy(prom_process_stat_t* self);
+prom_process_stat_file_t *prom_process_stat_file_new(const char *path);
+int prom_process_stat_file_destroy(prom_process_stat_file_t *self);
+prom_process_stat_t *prom_process_stat_new(prom_process_stat_file_t *stat_f);
+int prom_process_stat_destroy(prom_process_stat_t *self);
 int prom_process_stats_init(void);
 
-#endif // PROM_PROCESS_STATS_I_H
+#endif  // PROM_PROCESS_STATS_I_H

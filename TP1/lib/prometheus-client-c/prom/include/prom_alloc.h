@@ -45,4 +45,4 @@ limitations under the License.
  */
 #define prom_free free
 
-#endif // PROM_ALLOC_H
+#endif  // PROM_ALLOC_H

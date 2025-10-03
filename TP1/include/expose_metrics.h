@@ -4,14 +4,6 @@
  */
 
 #include "metrics.h"
-#include <errno.h>
-#include <prom.h>
-#include <promhttp.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h> // Para sleep
 
 /**
  * @brief Tamaño del buffer utilizado para almacenar datos.
@@ -148,6 +140,54 @@ void update_inactive_time();
 void update_IO_wait();
 
 /**
+ * @brief Actualiza la métrica tasa de ffragmentacion.
+ */
+void update_fragmentation_rate();
+
+/**
+ * @brief Actualiza la métrica de memoria RAM residente (RSS).
+ */
+void update_resident_memory();
+
+/**
+ * @brief Actualiza la métrica de memoria virtual utilizada por el proceso.
+ */
+void update_virtual_memory();
+
+/**
+ * @brief Actualiza la métrica de tamaño del heap.
+ */
+void update_heap_size();
+
+/**
+ * @brief Actualiza la métrica del tiempo promedio de malloc().
+ *
+ * @param elapsed_time Tiempo de la última ejecución en nanosegundos.
+ */
+void update_avg_malloc_time(unsigned long long elapsed_time);
+
+/**
+ * @brief Actualiza la métrica del tiempo promedio de free().
+ *
+ * @param elapsed_time Tiempo de la última ejecución en nanosegundos.
+ */
+void update_avg_free_time(unsigned long long elapsed_time);
+
+/**
+ * @brief Actualiza la métrica del tiempo promedio de realloc().
+ *
+ * @param elapsed_time Tiempo de la última ejecución en nanosegundos.
+ */
+void update_avg_realloc_time(unsigned long long elapsed_time);
+
+/**
+ * @brief Actualiza la métrica del tiempo promedio de calloc().
+ *
+ * @param elapsed_time Tiempo de la última ejecución en nanosegundos.
+ */
+void update_avg_calloc_time(unsigned long long elapsed_time);
+
+/**
  * @brief Función del hilo para exponer las métricas vía HTTP en el puerto 8000.
  * @param arg Argumento no utilizado.
  * @return NULL
@@ -169,3 +209,8 @@ bool registroMetricas();
  * @brief Destructor de mutex
  */
 void destroy_mutex();
+
+/**
+ * @brief Actualiza todas las metricas 
+ */
+void update_metrics();

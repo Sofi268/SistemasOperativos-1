@@ -28,96 +28,74 @@
 #include "prom_metric_sample_t.h"
 #include "prom_metric_t.h"
 
-prom_gauge_t* prom_gauge_new(const char* name, const char* help, size_t label_key_count, const char** label_keys)
-{
-    return (prom_gauge_t*)prom_metric_new(PROM_GAUGE, name, help, label_key_count, label_keys);
+prom_gauge_t *prom_gauge_new(const char *name, const char *help, size_t label_key_count, const char **label_keys) {
+  return (prom_gauge_t *)prom_metric_new(PROM_GAUGE, name, help, label_key_count, label_keys);
 }
 
-int prom_gauge_destroy(prom_gauge_t* self)
-{
-    PROM_ASSERT(self != NULL);
-    int r = 0;
-    r = prom_metric_destroy(self);
-    self = NULL;
-    return r;
+int prom_gauge_destroy(prom_gauge_t *self) {
+  PROM_ASSERT(self != NULL);
+  int r = 0;
+  r = prom_metric_destroy(self);
+  self = NULL;
+  return r;
 }
 
-int prom_gauge_inc(prom_gauge_t* self, const char** label_values)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 1;
-    if (self->type != PROM_GAUGE)
-    {
-        PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
-        return 1;
-    }
-    prom_metric_sample_t* sample = prom_metric_sample_from_labels(self, label_values);
-    if (sample == NULL)
-        return 1;
-    return prom_metric_sample_add(sample, 1.0);
+int prom_gauge_inc(prom_gauge_t *self, const char **label_values) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 1;
+  if (self->type != PROM_GAUGE) {
+    PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
+    return 1;
+  }
+  prom_metric_sample_t *sample = prom_metric_sample_from_labels(self, label_values);
+  if (sample == NULL) return 1;
+  return prom_metric_sample_add(sample, 1.0);
 }
 
-int prom_gauge_dec(prom_gauge_t* self, const char** label_values)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 1;
-    if (self->type != PROM_GAUGE)
-    {
-        PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
-        return 1;
-    }
-    prom_metric_sample_t* sample = prom_metric_sample_from_labels(self, label_values);
-    if (sample == NULL)
-        return 1;
-    return prom_metric_sample_sub(sample, 1.0);
+int prom_gauge_dec(prom_gauge_t *self, const char **label_values) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 1;
+  if (self->type != PROM_GAUGE) {
+    PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
+    return 1;
+  }
+  prom_metric_sample_t *sample = prom_metric_sample_from_labels(self, label_values);
+  if (sample == NULL) return 1;
+  return prom_metric_sample_sub(sample, 1.0);
 }
 
-int prom_gauge_add(prom_gauge_t* self, double r_value, const char** label_values)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 1;
-    if (self->type != PROM_GAUGE)
-    {
-        PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
-        return 1;
-    }
-    prom_metric_sample_t* sample = prom_metric_sample_from_labels(self, label_values);
-    if (sample == NULL)
-        return 1;
-    return prom_metric_sample_add(sample, r_value);
+int prom_gauge_add(prom_gauge_t *self, double r_value, const char **label_values) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 1;
+  if (self->type != PROM_GAUGE) {
+    PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
+    return 1;
+  }
+  prom_metric_sample_t *sample = prom_metric_sample_from_labels(self, label_values);
+  if (sample == NULL) return 1;
+  return prom_metric_sample_add(sample, r_value);
 }
 
-int prom_gauge_sub(prom_gauge_t* self, double r_value, const char** label_values)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 1;
-    if (self->type != PROM_GAUGE)
-    {
-        PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
-        return 1;
-    }
-    prom_metric_sample_t* sample = prom_metric_sample_from_labels(self, label_values);
-    if (sample == NULL)
-        return 1;
-    return prom_metric_sample_sub(sample, r_value);
+int prom_gauge_sub(prom_gauge_t *self, double r_value, const char **label_values) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 1;
+  if (self->type != PROM_GAUGE) {
+    PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
+    return 1;
+  }
+  prom_metric_sample_t *sample = prom_metric_sample_from_labels(self, label_values);
+  if (sample == NULL) return 1;
+  return prom_metric_sample_sub(sample, r_value);
 }
 
-int prom_gauge_set(prom_gauge_t* self, double r_value, const char** label_values)
-{
-    PROM_ASSERT(self != NULL);
-    if (self == NULL)
-        return 1;
-    if (self->type != PROM_GAUGE)
-    {
-        PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
-        return 1;
-    }
-    prom_metric_sample_t* sample = prom_metric_sample_from_labels(self, label_values);
-    if (sample == NULL)
-        return 1;
-    return prom_metric_sample_set(sample, r_value);
+int prom_gauge_set(prom_gauge_t *self, double r_value, const char **label_values) {
+  PROM_ASSERT(self != NULL);
+  if (self == NULL) return 1;
+  if (self->type != PROM_GAUGE) {
+    PROM_LOG(PROM_METRIC_INCORRECT_TYPE);
+    return 1;
+  }
+  prom_metric_sample_t *sample = prom_metric_sample_from_labels(self, label_values);
+  if (sample == NULL) return 1;
+  return prom_metric_sample_set(sample, r_value);
 }

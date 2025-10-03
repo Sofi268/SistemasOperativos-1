@@ -20,11 +20,10 @@
 #include "prom_metric_sample.h"
 #include "prom_metric_t.h"
 
-struct prom_metric_sample
-{
-    prom_metric_type_t type; /**< type is the metric type for the sample */
-    char* l_value;           /**< l_value is the full metric name and label set represeted as a string */
-    _Atomic double r_value;  /**< r_value is the value of the metric sample */
+struct prom_metric_sample {
+  prom_metric_type_t type; /**< type is the metric type for the sample */
+  char *l_value;           /**< l_value is the full metric name and label set represeted as a string */
+  _Atomic double r_value;  /**< r_value is the value of the metric sample */
 };
 
-#endif // PROM_METRIC_SAMPLE_T_H
+#endif  // PROM_METRIC_SAMPLE_T_H

@@ -53,8 +53,7 @@ limitations under the License.
  * @code{.c}
  *
  * void foo_metric_init(void) {
- *   my_counter = prom_collector_registry_must_register_metric(prom_counter_new("my_counter", "counts things", 0,
- * NULL));
+ *   my_counter = prom_collector_registry_must_register_metric(prom_counter_new("my_counter", "counts things", 0, NULL));
  * }
  *
  * @endcode

@@ -19,8 +19,8 @@
 #ifndef PROM_COLLECTOR_REGISTRY_I_INCLUDED
 #define PROM_COLLECTOR_REGISTRY_I_INCLUDED
 
-int prom_collector_registry_enable_custom_process_metrics(prom_collector_registry_t* self,
-                                                          const char* process_limits_path,
-                                                          const char* process_stats_path);
+int prom_collector_registry_enable_custom_process_metrics(prom_collector_registry_t *self,
+                                                          const char *process_limits_path,
+                                                          const char *process_stats_path);
 
-#endif // PROM_COLLECTOR_REGISTRY_I_INCLUDED
+#endif  // PROM_COLLECTOR_REGISTRY_I_INCLUDED

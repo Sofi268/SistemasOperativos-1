@@ -25,23 +25,21 @@
 // Private
 #include "prom_linked_list_t.h"
 
-typedef void (*prom_map_node_free_value_fn)(void*);
+typedef void (*prom_map_node_free_value_fn)(void *);
 
-struct prom_map_node
-{
-    const char* key;
-    void* value;
-    prom_map_node_free_value_fn free_value_fn;
+struct prom_map_node {
+  const char *key;
+  void *value;
+  prom_map_node_free_value_fn free_value_fn;
 };
 
-struct prom_map
-{
-    size_t size;                /**< contains the size of the map */
-    size_t max_size;            /**< stores the current max_size */
-    prom_linked_list_t* keys;   /**< linked list containing containing all keys present */
-    prom_linked_list_t** addrs; /**< Sequence of linked lists. Each list contains nodes with the same index */
-    pthread_rwlock_t* rwlock;
-    prom_map_node_free_value_fn free_value_fn;
+struct prom_map {
+  size_t size;                /**< contains the size of the map */
+  size_t max_size;            /**< stores the current max_size */
+  prom_linked_list_t *keys;   /**< linked list containing containing all keys present */
+  prom_linked_list_t **addrs; /**< Sequence of linked lists. Each list contains nodes with the same index */
+  pthread_rwlock_t *rwlock;
+  prom_map_node_free_value_fn free_value_fn;
 };
 
-#endif // PROM_MAP_T_H
+#endif  // PROM_MAP_T_H
